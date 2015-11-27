@@ -31,6 +31,8 @@ namespace Metaregistrar\Retro {
          */
         protected $timeout;
 
+	protected $result;
+
         function __construct($question,$logging = false)
         {
             if ($logging)
@@ -43,6 +45,7 @@ namespace Metaregistrar\Retro {
             set_error_handler(array($this,'error_handler'));
             $this->writelog("Retro class Initialised");
             $this->query($question);
+
         }
 
         function __destruct()
@@ -69,10 +72,9 @@ namespace Metaregistrar\Retro {
          * @return array
          * @throws \Exception
          */
-        function Query($question)
+        private function Query($question)
         {
-            $host=$this->server;
-            if (!$socket=@fsockopen($host,$this->port,$this->timeout))
+            if (!$socket=@fsockopen($this->server,$this->port,$this->timeout))
             {
                 throw new \Exception("Failed to open socket to ".$host);
             }
@@ -91,8 +93,16 @@ namespace Metaregistrar\Retro {
             }
             fclose($socket);
 
-            return $this->rawbuffer;
+            $this->result = $this->processbuffer($this->rawbuffer);
         }
+
+
+	private function processbuffer($buffer) {
+		$processed = array();
+		$list = explode("\13",$buffer);
+		var_dump($list);
+		return $processed;
+	}
 
         public function setServer($server)
         {
