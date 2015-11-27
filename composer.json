@@ -1,0 +1,12 @@
+{
+  "name": "metaregistrar/php-nl-retro",
+  "description": "A simple PHP library to connect to the .NL retro service",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Ewout de Graaf",
+      "email": "ewout@metaregistrar.com"
+    }
+  ]
+}
