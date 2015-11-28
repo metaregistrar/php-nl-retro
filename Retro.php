@@ -76,7 +76,7 @@ namespace Metaregistrar\Retro {
         {
             if (!$socket=@fsockopen($this->server,$this->port,$this->timeout))
             {
-                throw new \Exception("Failed to open socket to ".$host);
+                throw new \Exception("Failed to open socket to ".$this->server);
             }
 
             $this->writeLog("Question: ".$question);
@@ -99,8 +99,9 @@ namespace Metaregistrar\Retro {
 
 	private function processbuffer($buffer) {
 		$processed = array();
+        $this->DebugBinary($buffer);
 		$list = explode("\13",$buffer);
-		var_dump($list);
+		//var_dump($list);
 		return $processed;
 	}
 
@@ -176,6 +177,28 @@ namespace Metaregistrar\Retro {
                 else if($x == 32) $base32 .= $map[32];
             }
             return $base32;
+        }
+
+        /**
+         * @param string $data
+         */
+        private function DebugBinary($data)
+        {
+            echo pack("S", $data);
+            for ($a = 0; $a < strlen($data); $a++) {
+                echo $a;
+                echo "\t";
+                printf("%d", $data[$a]);
+                echo "\t";
+                $hex = bin2hex($data[$a]);
+                echo "0x" . $hex;
+                echo "\t";
+                $dec = hexdec($hex);
+                echo $dec;
+                echo "\t";
+                if (($dec > 30) && ($dec < 150)) echo $data[$a];
+                echo "\n";
+            }
         }
 
     }
