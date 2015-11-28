@@ -100,9 +100,13 @@ namespace Metaregistrar\Retro {
         private function processbuffer($buffer) {
             $this->result = array();
             $list = explode("\n",$buffer);
+            $resultsfound = $list[0];
             for ($count=1; $count<count($list)-1; $count++) {
                 list($domain,$date) = explode(';',$list[$count]);
                 $this->result[]=array('domainname'=>$domain,'date'=>$date);
+            }
+            if ($resultsfound != count($this->result)) {
+                throw new \Exception("Count of results does not match actual data - not everything was read properly");
             }
         }
 
@@ -150,38 +154,6 @@ namespace Metaregistrar\Retro {
             {
                 $this->logentries[] = "-----".date("Y-m-d H:i:s")."-----".$text."-----";
             }
-        }
-
-        function base32encode($input, $padding = true) {
-
-            $map = array(
-                '0', '1', '2', '3', '4', '5', '6', '7', //  7
-                '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', // 15
-                'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', // 23
-                'o', 'p', 'q', 'r', 's', 't', 'u', 'v', // 31
-                '='  // padding char
-            );
-
-            if(empty($input)) return "";
-            $input = str_split($input);
-            $binaryString = "";
-            for($i = 0; $i < count($input); $i++) {
-                $binaryString .= str_pad(base_convert(ord($input[$i]), 10, 2), 8, '0', STR_PAD_LEFT);
-            }
-            $fiveBitBinaryArray = str_split($binaryString, 5);
-            $base32 = "";
-            $i=0;
-            while($i < count($fiveBitBinaryArray)) {
-                $base32 .= $map[base_convert(str_pad($fiveBitBinaryArray[$i], 5,'0'), 2, 10)];
-                $i++;
-            }
-            if($padding && ($x = strlen($binaryString) % 40) != 0) {
-                if($x == 8) $base32 .= str_repeat($map[32], 6);
-                else if($x == 16) $base32 .= str_repeat($map[32], 4);
-                else if($x == 24) $base32 .= str_repeat($map[32], 3);
-                else if($x == 32) $base32 .= $map[32];
-            }
-            return $base32;
         }
 
         /**
