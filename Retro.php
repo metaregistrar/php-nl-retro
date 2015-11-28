@@ -26,7 +26,7 @@ namespace Metaregistrar\Retro {
         protected $port;
         /**
          *
-         * @var integer $timeout = 60
+         * @var integer $timeout = 600
          */
         protected $timeout;
 
@@ -85,28 +85,30 @@ namespace Metaregistrar\Retro {
                 throw new \Exception("Failed to write question to TCP socket");
             }
             $datasize = 8192;
-	$rawbuffer = '';
-while (!feof($socket)) {
-    $rawbuffer .= fread($socket, $datasize);
-}
-                fclose($socket);
-	if (strlen($rawbuffer)==0) {
-                throw new \Exception("Failed to read data buffer");
+	        $rawbuffer = '';
+            while (!feof($socket)) {
+                $rawbuffer .= fread($socket, $datasize);
             }
-
+            fclose($socket);
+        	if (strlen($rawbuffer)==0) {
+                throw new \Exception("No response from Retro service - is your IP whitelisted?");
+            }
             $this->processbuffer($rawbuffer);
         }
 
 
-	private function processbuffer($buffer) {
-		$processed = array();
-		$list = explode("\n",$buffer);
-		for ($count=1; $count<count($list)-1; $count++) {
-			list($domain,$date) = explode(';',$list[$count]);
-			$this->result[]=array('domainname'=>$domain,'date'=>$date);
-		}
-		var_dump($this->result);
-	}
+        private function processbuffer($buffer) {
+            $this->result = array();
+            $list = explode("\n",$buffer);
+            for ($count=1; $count<count($list)-1; $count++) {
+                list($domain,$date) = explode(';',$list[$count]);
+                $this->result[]=array('domainname'=>$domain,'date'=>$date);
+            }
+        }
+
+        public function getResults() {
+            return $this->result;
+        }
 
         public function setServer($server)
         {
@@ -185,7 +187,7 @@ while (!feof($socket)) {
         /**
          * @param string $data
          */
-        private function DebugBinary($data)
+        /*private function DebugBinary($data)
         {
             echo pack("S", $data);
             for ($a = 0; $a < strlen($data); $a++) {
@@ -202,7 +204,7 @@ while (!feof($socket)) {
                 if (($dec > 30) && ($dec < 150)) echo $data[$a];
                 echo "\n";
             }
-        }
+        }*/
 
     }
 
