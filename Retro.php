@@ -4,7 +4,6 @@ namespace Metaregistrar\Retro {
 
     class Retro
     {
-        private $rawbuffer;
         /**
          *
          * @var boolean $logging
@@ -85,24 +84,28 @@ namespace Metaregistrar\Retro {
                 fclose($socket);
                 throw new \Exception("Failed to write question to TCP socket");
             }
-            $datasize = 20000;
-            if (!$this->rawbuffer=fread($socket,$datasize))
-            {
+            $datasize = 8192;
+	$rawbuffer = '';
+while (!feof($socket)) {
+    $rawbuffer .= fread($socket, $datasize);
+}
                 fclose($socket);
+	if (strlen($rawbuffer)==0) {
                 throw new \Exception("Failed to read data buffer");
             }
-            fclose($socket);
 
-            $this->result = $this->processbuffer($this->rawbuffer);
+            $this->processbuffer($rawbuffer);
         }
 
 
 	private function processbuffer($buffer) {
 		$processed = array();
-        $this->DebugBinary($buffer);
-		$list = explode("\13",$buffer);
-		//var_dump($list);
-		return $processed;
+		$list = explode("\n",$buffer);
+		for ($count=1; $count<count($list)-1; $count++) {
+			list($domain,$date) = explode(';',$list[$count]);
+			$this->result[]=array('domainname'=>$domain,'date'=>$date);
+		}
+		var_dump($this->result);
 	}
 
         public function setServer($server)
