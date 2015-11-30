@@ -100,7 +100,10 @@ namespace Metaregistrar\Retro {
         private function processbuffer($buffer) {
             $this->result = array();
             $list = explode("\n",$buffer);
-            $resultsfound = $list[0];
+            list($resultsfound,$message) = explode(';',$list[0]);
+            if ($resultsfound == 0) {
+                throw new \Exception($message);
+            }
             for ($count=1; $count<count($list)-1; $count++) {
                 list($domain,$date) = explode(';',$list[$count]);
                 $this->result[]=array('domainname'=>$domain,'date'=>$date);
