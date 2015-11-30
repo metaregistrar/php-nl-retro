@@ -100,9 +100,16 @@ namespace Metaregistrar\Retro {
         private function processbuffer($buffer) {
             $this->result = array();
             $list = explode("\n",$buffer);
-            list($resultsfound,$message) = explode(';',$list[0]);
-            if ($resultsfound == 0) {
-                throw new \Exception($message);
+            if (is_numeric($list[0])) {
+                $resultsfound = $list[0];
+                if ($resultsfound == 0) {
+                    throw new \Exception("No results found");
+                }
+            } else {
+                list($resultsfound,$message) = explode(';',$list[0]);
+                if ($resultsfound == 0) {
+                    throw new \Exception($message);
+                }
             }
             for ($count=1; $count<count($list)-1; $count++) {
                 list($domain,$date) = explode(';',$list[$count]);
